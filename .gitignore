@@ -1,0 +1,7 @@
+# All .env files
+*.env
+
+# Data files
+airflow/broker/*
+airflow/data/*
+airflow/logs/*
