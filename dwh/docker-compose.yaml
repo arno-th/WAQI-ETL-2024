@@ -1,10 +1,20 @@
 services:
   clickhouse:
     image: clickhouse/clickhouse-server:latest
-    container_name: clickhouse
+    container_name: ${CLICKHOUSE_HOST}
     ports:
       - "8123:8123"
       - "9000:9000"
+    environment:
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PWORD}
     volumes:
       - ./data:/var/lib/clickhouse
+    networks:
+      - data-network
     restart: always
+
+networks:
+  data-network:
+    name: ${NETWORK_NAME}
+    driver: bridge

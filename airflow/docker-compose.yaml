@@ -49,15 +49,17 @@ x-airflow-common:
   # In order to add custom dependencies or upgrade provider packages you can use your extended image.
   # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
   # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
-  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.10.2}
-  # build: .
+  # image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.10.2}
+  build:
+    context: .
+    dockerfile: Dockerfile
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PWORD}@${POSTGRES_HOST}/airflow
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://${POSTGRES_USER}:${POSTGRES_PWORD}@${POSTGRES_HOST}/airflow
     # AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
-    AIRFLOW__CELERY__BROKER_URL: amqp://guest:guest@rabbitMQ:5672/
+    AIRFLOW__CELERY__BROKER_URL: amqp://${RMQ_USER}:${RMQ_PWORD}@${RMQ_HOST}:${RMQ_PORT}/
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
@@ -73,6 +75,11 @@ x-airflow-common:
     # The following line can be used to set a custom config file, stored in the local config folder
     # If you want to use it, outcomment it and replace airflow.cfg with the name of your config file
     # AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
+    AIRFLOW_VAR_WAQI_API_TOKEN: ${WAQI_API_TOKEN}
+    AIRFLOW_VAR_CLICKHOUSE_HOST: ${CLICKHOUSE_HOST}
+    AIRFLOW_VAR_CLICKHOUSE_PORT: ${CLICKHOUSE_PORT}
+    AIRFLOW_VAR_CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+    AIRFLOW_VAR_CLICKHOUSE_PWORD: ${CLICKHOUSE_PWORD}
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
@@ -86,27 +93,37 @@ x-airflow-common:
       condition: service_healthy
     postgres:
       condition: service_healthy
+  networks:
+    - data-network
+
 
 services:
   postgres:
     image: postgres:13
+    container_name: ${POSTGRES_HOST}
     environment:
-      POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: airflow
-      POSTGRES_DB: airflow
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - ./data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "airflow"]
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 10s
       retries: 5
       start_period: 5s
     restart: always
+    networks:
+      - data-network
 
   rabbitMQ:
     image: rabbitmq:management
+    container_name: ${RMQ_HOST}
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RMQ_PWORD}
     ports:
-      - "5672:5672"     # Port for RabbitMQ client connections
+      - "${RMQ_PORT}:5672"     # Port for RabbitMQ client connections
       - "15672:15672"   # Port for RabbitMQ management UI
     volumes:
       - ./broker:/var/lib/rabbitmq    # Persist RabbitMQ data
@@ -117,6 +134,8 @@ services:
       retries: 50
       start_period: 30s
     restart: always
+    networks:
+      - data-network
 
   airflow-webserver:
     <<: *airflow-common
@@ -130,6 +149,8 @@ services:
       retries: 5
       start_period: 30s
     restart: always
+    environment:
+      <<: *airflow-common-env
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
@@ -145,6 +166,8 @@ services:
       retries: 5
       start_period: 30s
     restart: always
+    environment:
+      <<: *airflow-common-env
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
@@ -240,6 +263,7 @@ services:
         mkdir -p /sources/logs /sources/dags /sources/plugins
         chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
         exec /entrypoint airflow version
+        exec /entrypoint airflow version
     # yamllint enable rule:line-length
     environment:
       <<: *airflow-common-env
@@ -289,3 +313,8 @@ services:
 
 volumes:
   postgres-db-volume:
+
+networks:
+  data-network:
+    name: ${NETWORK_NAME}
+    external: true  
