@@ -2,6 +2,10 @@
 *.env
 
 # Data files
-airflow/broker/*
-airflow/data/*
-airflow/logs/*
+airflow/broker/
+airflow/data/
+airflow/logs/
+dwh/data/
+
+#Python environment
+.venv
