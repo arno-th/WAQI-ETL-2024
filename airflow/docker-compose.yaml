@@ -75,6 +75,7 @@ x-airflow-common:
     # The following line can be used to set a custom config file, stored in the local config folder
     # If you want to use it, outcomment it and replace airflow.cfg with the name of your config file
     # AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
+    AIRFLOW_CONN_WAQI_API: http://api.waqi.info
     AIRFLOW_VAR_WAQI_API_TOKEN: ${WAQI_API_TOKEN}
     AIRFLOW_VAR_CLICKHOUSE_HOST: ${CLICKHOUSE_HOST}
     AIRFLOW_VAR_CLICKHOUSE_PORT: ${CLICKHOUSE_PORT}
@@ -82,7 +83,7 @@ x-airflow-common:
     AIRFLOW_VAR_CLICKHOUSE_PWORD: ${CLICKHOUSE_PWORD}
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
-    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
+    - airflow-logs-volume:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
   user: "${AIRFLOW_UID:-50000}:0"
@@ -106,7 +107,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - postgres-db-volume:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 10s
@@ -116,7 +117,7 @@ services:
     networks:
       - data-network
 
-  rabbitMQ:
+  rabbitMQ: 
     image: rabbitmq:management
     container_name: ${RMQ_HOST}
     environment:
@@ -126,7 +127,7 @@ services:
       - "${RMQ_PORT}:5672"     # Port for RabbitMQ client connections
       - "15672:15672"   # Port for RabbitMQ management UI
     volumes:
-      - ./broker:/var/lib/rabbitmq    # Persist RabbitMQ data
+      - broker-volume:/var/lib/rabbitmq    # Persist RabbitMQ data
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 10s
@@ -263,7 +264,6 @@ services:
         mkdir -p /sources/logs /sources/dags /sources/plugins
         chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
         exec /entrypoint airflow version
-        exec /entrypoint airflow version
     # yamllint enable rule:line-length
     environment:
       <<: *airflow-common-env
@@ -313,6 +313,11 @@ services:
 
 volumes:
   postgres-db-volume:
+    driver: local
+  broker-volume:
+    driver: local
+  airflow-logs-volume:
+    driver: local
 
 networks:
   data-network:

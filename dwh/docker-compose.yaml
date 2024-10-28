@@ -9,12 +9,16 @@ services:
       - CLICKHOUSE_USER=${CLICKHOUSE_USER}
       - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PWORD}
     volumes:
-      - ./data:/var/lib/clickhouse
+      - clickhouse_data:/var/lib/clickhouse
     networks:
       - data-network
     restart: always
+    user: "${CLICKHOUSE_USER}:${CLICKHOUSE_USER}"
 
 networks:
   data-network:
     name: ${NETWORK_NAME}
     driver: bridge
+
+volumes:
+  clickhouse_data:
