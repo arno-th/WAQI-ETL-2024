@@ -28,6 +28,8 @@ See the following [Github repo](https://github.com/ClickHouse/examples/blob/main
 ## Prerequisites
 Docker is required to run the docker containers. You can find installation instrutions on the [Docker website](https://docs.docker.com/desktop/).
 
+The WAQI API requires an API token for authentication. A free token can be generated [here](https://aqicn.org/data-platform/token/).
+
 While Python is not strictly required to run the project as it is running in Docker containers, it is recommended to have Python installed for Airflow and linting purposes.
 
 ## How to run
