@@ -23,3 +23,23 @@ The docs for the API can be found [here](https://aqicn.org/json-api/doc/)
 ## Database
 The database container runs a single clickhouse instance (this could be augmented to use a more scalable container with a scheduler and workers similar to the Airflow container - however that is beyond the current scope of this project)
 See the following [Github repo](https://github.com/ClickHouse/examples/blob/main/docker-compose-recipes/README.md) for further examples of how to set up various Clickhouse configurations.
+
+# Instructions
+## Prerequisites
+Docker is required to run the docker containers. You can find installation instrutions on the [Docker website](https://docs.docker.com/desktop/).
+
+While Python is not strictly required to run the project as it is running in Docker containers, it is recommended to have Python installed for Airflow and linting purposes.
+
+## How to run
+1. Use the sample .env files to create your own .env files. This can be done by renaming/copy and pasting the samples
+1. Open a terminal in `./dwh`; Run `docker-compose up -d`, this will start the docker container for the database in detached mode (detached means the terminal does not keep focus of the Docker logs)
+1. In the `./dwh` folder, run `./setup_dwh.ps1` or `./setup_dwh.sh` (in your respective preferred Powershell or Shell terminal). You can test database using `./dwh/check_air_quality_data.ps1` or `./dwh/check_air_quality_data.sh`.
+1. Open a terminal (or change directory) in `./airflow`; Run `docker-compose up -d` to start the Airflow container
+1. Open Airflow by going to `localhost:8080` in a web browser. Login using the Airflow user credentials in your Airflow .env file
+The home page should look something like this. ![Picture of Airflow homepage](assets/Airflow-home.png)
+1. You can toggle the DAG with the button next to the DAG title.  
+![Airflow DAG title and toggle button](assets/Airflow-toggle.png)  
+1. Once the DAG has completed, the dashboard should look like the following:
+![Run Complete image](assets/Airflow-complete.png)
+You can see what is in the database using `./dwh/check_air_quality_data.ps1` or `./dwh/check_air_quality_data.sh` again.
+1. While the Docker containers are running, the DAG will run daily at 00h00 UTC, inserting new record into the table every run.
