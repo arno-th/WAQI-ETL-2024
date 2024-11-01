@@ -7,5 +7,6 @@ airflow/data/
 airflow/logs/
 dwh/data/
 
-#Python environment
+# Python environment and cache files
 .venv
+*.pyc
