@@ -1,14 +1,13 @@
 import logging
 from typing import TYPE_CHECKING
+
 from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
-
-
 
 logger = logging.getLogger("airflow.task")
 
 @task()
-def get_available_stations(**context) -> list[dict]:
+def get_available_stations() -> list[dict]:
     import json
 
     if TYPE_CHECKING:
@@ -49,7 +48,7 @@ def get_available_stations(**context) -> list[dict]:
     return stations_filtered
 
 @task()
-def get_station_data(stations: list[dict], **context) -> list[dict]:
+def get_station_data(stations: list[dict]) -> list[dict]:
     import json
 
     if TYPE_CHECKING:
@@ -92,16 +91,16 @@ def get_station_data(stations: list[dict], **context) -> list[dict]:
             continue
 
         # Store station data
-        station = data["data"]
-        logger.info(f"Station: {station}")
-        stations_data.append(station)
+        station_data = data["data"]
+        logger.info(f"Station: {station_data}")
+        stations_data.append(station_data)
         logger.info("::endgroup::")
 
     logger.info(f"Retrieved data for {len(stations_data)} of {len(stations)} stations")
     return stations_data
 
 @task()
-def process_air_quality_data(stations_data: list[dict], **context):
+def process_air_quality_data(stations_data: list[dict]) -> list[dict]:
     refined_data = []
     num_stations = len(stations_data)
     logger.info(f"Processing data for {num_stations} stations")
@@ -125,7 +124,7 @@ def process_air_quality_data(stations_data: list[dict], **context):
     return refined_data
 
 @task()
-def load_dwh(transformed_data: list[dict], **context) -> None:
+def load_dwh(transformed_data: list[dict]) -> None:
     from src.clickhouse import get_clickhouse_con
     con = get_clickhouse_con()
 
@@ -155,7 +154,7 @@ def etl_dag() -> None:
     stations_data_raw = get_station_data(station_names)
     stations_data_transformed = process_air_quality_data(stations_data_raw)
 
-    station_names >> stations_data_raw >> stations_data_transformed >> load_dwh(stations_data_transformed)
+    station_names >> stations_data_raw >> stations_data_transformed >> load_dwh(stations_data_transformed) # noqa: E501
 
 
 etl_dag()
