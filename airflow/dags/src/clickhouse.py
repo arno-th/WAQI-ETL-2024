@@ -1,7 +1,9 @@
-from airflow.models import Variable
 import ibis
 import ibis.backends
 import ibis.backends.clickhouse
+
+from airflow.models import Variable
+
 
 def get_clickhouse_con() -> ibis.backends.clickhouse.Backend:
     clickhouse_host = Variable.get("clickhouse_host")
@@ -12,6 +14,6 @@ def get_clickhouse_con() -> ibis.backends.clickhouse.Backend:
         host=clickhouse_host,
         port=clickhouse_port,
         user=clickhouse_user,
-        password=clickhouse_pwd
+        password=clickhouse_pwd,
     )
     return con
