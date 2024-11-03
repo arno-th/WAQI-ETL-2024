@@ -1,7 +1,9 @@
 import logging
-
+from typing import TYPE_CHECKING
 from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
+
+
 
 logger = logging.getLogger("airflow.task")
 
@@ -9,7 +11,8 @@ logger = logging.getLogger("airflow.task")
 def get_available_stations(**context) -> list[dict]:
     import json
 
-    from requests import Response
+    if TYPE_CHECKING:
+        from requests import Response
 
     from airflow.models import Variable
     from airflow.providers.http.hooks.http import HttpHook
@@ -49,7 +52,8 @@ def get_available_stations(**context) -> list[dict]:
 def get_station_data(stations: list[dict], **context) -> list[dict]:
     import json
 
-    from requests import Response
+    if TYPE_CHECKING:
+        from requests import Response
 
     from airflow.models import Variable
     from airflow.providers.http.hooks.http import HttpHook
@@ -78,7 +82,7 @@ def get_station_data(stations: list[dict], **context) -> list[dict]:
         logger.info(f"Response data: {data}")
 
         # Check response status
-        if "data" not in data.keys() or "status" not in data.keys():
+        if "data" not in data or "status" not in data:
             logger.error(f"No status or data in response. Response: {data}")
             logger.info("::endgroup::")
             continue
@@ -121,7 +125,7 @@ def process_air_quality_data(stations_data: list[dict], **context):
     return refined_data
 
 @task()
-def load_dwh(transformed_data: list[dict], **context):
+def load_dwh(transformed_data: list[dict], **context) -> None:
     from src.clickhouse import get_clickhouse_con
     con = get_clickhouse_con()
 
@@ -146,7 +150,7 @@ default_args = {
     schedule_interval="@daily",
     catchup=False,
 )
-def etl_dag():
+def etl_dag() -> None:
     station_names = get_available_stations()
     stations_data_raw = get_station_data(station_names)
     stations_data_transformed = process_air_quality_data(stations_data_raw)
