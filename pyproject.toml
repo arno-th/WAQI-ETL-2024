@@ -83,6 +83,7 @@ select = [
     "PD",   # pandas checks
     "AIR",  # airflow checks
     "RUF",  # Ruff checks
+    #"PL", # Pylint checks (not necessary atm)
 ]
 ignore = [
     "RET504", # Ignore "unecessary" assignment before return
