@@ -57,12 +57,34 @@ docstring-code-line-length = "dynamic"
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
 # McCabe complexity (`C901`) by default.
 select = [
-    "ALL"
+    "F",    # Pyflake checks
+    "E",    # Pycodestyle errors
+    "W",    # Pycodestyle warnings
+    "I",    # Isort imports
+    "N",    # pep8 naming conventions
+    "ANN",  # flake8 type annotations
+    "S",    # flake8 security checks
+    "B",    # flake8 bugber (common bug and design issues)
+    "A",    # flake8 builtins checks
+    "COM",  # flake8 comma checks
+    "C",    # flake8 comprehension checks
+    "DTZ",  # flake8 datetime checks
+    "ISC",  # flake8 string concat checks
+    "ICN",  # flake8 import conventions
+    "LOG",  # flake8 logging checks
+    "PIE",  # flake8 misc lints
+    "T20",  # flake8 no print statements allowed
+    "Q",    # flake8 quote checks
+    "RET",  # flake8 return checks
+    "SIM",  # flake8 simplify rules
+    "TCH",  # flake8 type checking
+    "ARG",  # flake8 unused args
+    "PTH",  # flake8 use pathlib instead os
+    "PD",   # pandas checks
+    "AIR",  # airflow checks
+    "RUF",  # Ruff checks
 ]
 ignore = [
-    "G", # Ignore logging checks
-    "INP001", # Ignore implicit namespace check
-    "D", # Ignore doc
     "RET504", # Ignore "unecessary" assignment before return
 ]
 
