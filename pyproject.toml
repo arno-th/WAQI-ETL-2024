@@ -87,6 +87,8 @@ select = [
 ]
 ignore = [
     "RET504", # Ignore "unecessary" assignment before return
+    "COM812", # Currently may cause conflicts with fixes, so disabling
+    "ISC001", # Currently may cause conflicts with fixes, so disabling
 ]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
