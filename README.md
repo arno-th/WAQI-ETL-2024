@@ -1,6 +1,44 @@
+![Actions status](https://github.com/arno-th/WAQI-ETL-2024/workflows/Lint/badge.svg)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Python](https://img.shields.io/badge/python-3.12-blue)
+![Docker](https://img.shields.io/badge/docker-yes-blue)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+
+# WAQI ETL 2024
+**A Docker-based ETL pipeline that loads air quality data from the World’s Air Pollution API into ClickHouse**
+
+## Table of Contents
+- [Introduction](#introduction)
+- [Platform](#platform)
+  - [Orchestration](#orchestration)
+  - [API](#api)
+  - [Database](#database)
+  - [Formatting and Linting](#formatting-and-linting)
+- [Instructions](#instructions)
+  - [Prerequisites](#prerequisites)
+  - [How to run](#how-to-run)
+
 # Introduction
 This project is a sample ETL and database.
-We use load data colelcted by stations from the World's Air Pollution API, and load relevant data points into a local database.
+We use load data collected by stations from the World's Air Pollution API, and load relevant data points into a local database.
+
+## Project Structure
+```plaintext
+.
+├── airflow/                # Airflow-related files
+│   ├── dags/               # DAG definitions
+│   ├── docker-compose.yaml
+│   ├── Dockerfile
+│   └── .env-sample         # Sample .env file for Airflow
+├── dwh/                    # Data warehouse (ClickHouse) setup
+│   ├── docker-compose.yml
+│   ├── setup_dwh.sh
+│   ├── check_air_quality_data.sh
+├── assets/                 # Images for the README
+├── .github/                # GitHub Actions workflows
+├── pyproject.toml          # Linting and formatting config
+└── README.md               # Project documentation
+```
 
 # Platform
 The ETL platform is built using docker, we create 2 containers; one for orchestration and one for the database.
@@ -34,7 +72,7 @@ This allows the use of:
 - `ruff check` to check for errors (add `--fix` argument to allow auto fixes for compatible rules)
 - `ruff format` to auto format files based on the selected rules.
 
-# Instructions
+# Getting Started
 ## Prerequisites
 Docker is required to run the docker containers. You can find installation instrutions on the [Docker website](https://docs.docker.com/desktop/).
 
@@ -48,8 +86,8 @@ While Python is not strictly required to run the project as it is running in Doc
 1. In the `./dwh` folder, run `./setup_dwh.ps1` or `./setup_dwh.sh` (in your respective preferred Powershell or Shell terminal). You can test database using `./dwh/check_air_quality_data.ps1` or `./dwh/check_air_quality_data.sh`.
 1. Open a terminal (or change directory) in `./airflow`; Run `docker-compose up -d` to start the Airflow container
 1. Open Airflow by going to `localhost:8080` in a web browser. Login using the Airflow user credentials in your Airflow .env file
-The home page should look something like this. ![Picture of Airflow homepage](assets/Airflow-home.png)
-1. You can toggle the DAG with the button next to the DAG title.  
+The home page of Airflow once the container is running: ![Picture of Airflow homepage](assets/Airflow-home.png)
+1. The DAG toggle button next to the DAG title in Airflow:  
 ![Airflow DAG title and toggle button](assets/Airflow-toggle.png)  
 1. Once the DAG has completed, the dashboard should look like the following:
 ![Run Complete image](assets/Airflow-complete.png)
