@@ -58,7 +58,7 @@ def get_station_data(stations: list[dict]) -> list[dict]:
     from airflow.providers.http.hooks.http import HttpHook
 
     # Set up hook
-    waqi_api_token = Variable.get("waqi_api_token")
+    waqi_api_token = Variable.get(f"waqi_api_token")
     httphook = HttpHook(
         method="GET",
         http_conn_id="waqi_api",
