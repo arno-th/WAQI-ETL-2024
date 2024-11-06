@@ -7,7 +7,7 @@ from airflow.utils.dates import days_ago
 logger = logging.getLogger("airflow.task")
 
 @task()
-def get_available_stations() -> list[dict]:
+def get_available_stations_() -> list[dict]:
     import json
 
     if TYPE_CHECKING:
