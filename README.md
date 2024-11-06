@@ -24,6 +24,16 @@ The docs for the API can be found [here](https://aqicn.org/json-api/doc/)
 The database container runs a single clickhouse instance (this could be augmented to use a more scalable container with a scheduler and workers similar to the Airflow container - however that is beyond the current scope of this project)
 See the following [Github repo](https://github.com/ClickHouse/examples/blob/main/docker-compose-recipes/README.md) for further examples of how to set up various Clickhouse configurations.
 
+## Formatting and Linting
+This project configures [Ruff](https://docs.astral.sh/ruff/) as a linter and formatter. The configuration is stored in `pyproject.toml`, which specifies which rules to apply when linting and formatting (see the [documentation](https://docs.astral.sh/ruff/rules/) for all available rules).
+
+A Github action has been setup in `.github\workflows\workflow.yml` which runs the Ruff linter on pushes to the Github. It will fail with relevant errors when any of the linting rules are violated, ensuring that the code adheres to the defined style and quality standards.
+
+Ruff can also be installed locally using `pip install ruff`.  
+This allows the use of:
+- `ruff check` to check for errors (add `--fix` argument to allow auto fixes for compatible rules)
+- `ruff format` to auto format files based on the selected rules.
+
 # Instructions
 ## Prerequisites
 Docker is required to run the docker containers. You can find installation instrutions on the [Docker website](https://docs.docker.com/desktop/).
