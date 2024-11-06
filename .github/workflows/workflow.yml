@@ -14,6 +14,6 @@ jobs:
       - name: Run Ruff
         uses: astral-sh/ruff-action@v1
         with:
-          args: .
+          src: .
         env:
           RUFF_OUTPUT_FORMAT: github
