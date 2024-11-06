@@ -30,19 +30,34 @@ We use load data collected by stations from the World's Air Pollution API, and l
 ## Project Structure
 ```plaintext
 .
-├── airflow/                # Airflow-related files
-│   ├── dags/               # DAG definitions
-│   ├── docker-compose.yaml
-│   ├── Dockerfile
-│   └── .env-sample         # Sample .env file for Airflow
-├── dwh/                    # Data warehouse (ClickHouse) setup
-│   ├── docker-compose.yml
-│   ├── setup_dwh.sh
-│   ├── check_air_quality_data.sh
-├── assets/                 # Images for the README
-├── .github/                # GitHub Actions workflows
-├── pyproject.toml          # Linting and formatting config
-└── README.md               # Project documentation
+├── .github/workflows/workflow.yml # Github actions workflow for linting with Ruff
+├── airflow/                       # Airflow-specific files
+│   ├── dags/                      # Directory for DAG definitions
+│   │   └── src/                   # Source folder for DAG code
+│   │       └── clickhouse.py      # Python script for ClickHouse integration
+│   │   └── air_quality_etl.py     # Source folder for DAG code
+│   ├── .env-sample                # Sample environment file for setup
+│   ├── docker-compose.yml         # Docker Compose configuration for Airflow
+│   ├── Dockerfile                 # Dockerfile for building Airflow container
+│   └── requirements.txt           # Python dependencies for Airflow
+├── assets/                        # Images for README documentation
+├── dwh/                           # Data warehouse setup for ClickHouse
+│   ├── .env-sample                # Sample environment file for setup
+│   ├── air_quality_data.sql       # SQL script for initial data setup
+│   ├── check_air_quality_data.ps1 # PowerShell script to check data in ClickHouse
+│   ├── check_air_quality_data.sh  # Shell script to check data in ClickHouse
+│   ├── createTables.sql           # SQL script to create necessary tables
+│   ├── docker-compose.yaml        # Docker Compose configuration for ClickHouse
+│   ├── sampleInsert.sql           # Sample SQL script for data insertion
+│   ├── setup_dwh.ps1              # PowerShell script to set up the data warehouse
+│   └── setup_dwh.sh               # Shell script to set up the data warehouse
+├── .gitignore                     # Git ignore file
+├── .python-version                # Python version specification
+├── LICENSE                        # Project license
+├── pyproject.toml                 # Configuration file for Ruff linter
+├── README.md                      # Project documentation (this file)
+└── requirements.txt               # Python dependencies for the project
+
 ```
 
 # Platform
